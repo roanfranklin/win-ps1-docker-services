@@ -1,0 +1,39 @@
+version: "3"
+
+services:
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.dominio.local`)"
+      - "traefik.http.routers.portainer.entrypoints=web"
+    #   - "traefik.http.routers.portainer.entrypoints=websecure"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+    #   - "traefik.http.routers.portainer.service=portainer"
+    #   - "traefik.http.routers.portainer.tls.certresolver=myresolver"
+    # ports:
+    #   - 9000:9000
+    volumes:
+      # # Linux
+      # - portainer_data:/data
+      # - /var/run/docker.sock:/var/run/docker.sock:ro
+      # # Windows
+      - portainer_data:C:\data
+    networks:
+      - nat
+
+networks:
+    nat:
+      external: true
+
+
+volumes:
+  portainer_data:
+    external: true
+
+
+# docker volume create portainer_data
+# abcdef@123456

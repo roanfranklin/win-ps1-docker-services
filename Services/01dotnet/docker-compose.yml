@@ -1,0 +1,27 @@
+
+version: "3"
+
+services:
+
+  dotnet01:
+    image: mcr.microsoft.com/dotnet/samples:aspnetapp
+    container_name: dotnet01
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dotnet01.rule=Host(`dotnet01.dominio.local`)"
+      - "traefik.http.routers.dotnet01.entrypoints=web"
+    #   - "traefik.http.routers.dotnet01.entrypoints=websecure"
+      - "traefik.http.services.dotnet01.loadbalancer.server.port=80"
+    #   - "traefik.http.routers.dotnet01.service=dotnet01"
+    #   - "traefik.http.routers.dotnet01.tls.certresolver=myresolver"
+    # ports:
+    #   - 8090:80
+    networks:
+      - nat
+  
+
+networks:
+  default:
+    external:
+      name: nat

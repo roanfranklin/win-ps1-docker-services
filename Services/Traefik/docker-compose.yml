@@ -1,0 +1,69 @@
+version: "3"
+
+services:
+
+  traefik:
+    # image: traefik:v2.9.6
+    image: winamd64/traefik:v2.9.6-windowsservercore-1809
+    container_name: traefik
+    restart: always
+    command:
+      # - "--log.level=DEBUG"
+      # - "--log.level=ERROR"
+      # - "--api=true"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.endpoint=tcp://192.168.26.77:2375"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      # # LetsEncrypt Staging Server - uncomment when testing
+      # - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      # - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      # # - "--certificatesresolvers.myresolver.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
+      # - "--certificatesresolvers.myresolver.acme.email=EMAIL_DO_ADMINd@gmail.com"
+      # - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      # - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+    labels:
+      - "traefik.enable=true"
+      # # Redirect all HTTP traffic to HTTPS
+      # - "traefik.http.routers.to-https.rule=HostRegexp(`{host:.+}`)"
+      # - "traefik.http.routers.to-https.entrypoints=web"
+      # - "traefik.http.routers.to-https.middlewares=to-https"
+      # # Acesso ao dashboard do Traefik
+      - "traefik.http.routers.traefik.rule=Host(`traefik.dominio.local`)"
+      - "traefik.http.routers.traefik.entrypoints=web"
+      # - "traefik.http.routers.traefik.entrypoints=websecure"
+      # - "traefik.http.routers.traefik.middlewares=auth"
+      - "traefik.http.routers.traefik.service=api@internal"
+      # - "traefik.http.routers.traefik.tls.certresolver=myresolver"
+      # # Auto redirecionamento da 80 ( http ) para 443 ( https )
+      # # - "traefik.http.middlewares.limit.buffering.maxRequestBodyBytes=2000000"
+      # # - "traefik.http.middlewares.limit.buffering.memRequestBodyBytes=2000000"
+      # # - "traefik.http.middlewares.limit.buffering.maxResponseBodyBytes=2000000"
+      # # - "traefik.http.middlewares.limit.buffering.memResponseBodyBytes=2000000"
+      # - "traefik.http.middlewares.to-https.redirectscheme.scheme=https"
+      # - "traefik.http.middlewares.to-https.redirectscheme.permanent=true"
+      # - "traefik.http.middlewares.auth.basicauth.users=admin:$$2y$$05$$mdk1XyTSd2jQxXbAz0mYVeonDsRsbgkl.UV.AKx6a2r/xO1TfYoO6"
+    ports:
+      - 80:80
+      - 443:443
+      # - 8080:8080
+    # volumes:
+    #   #- ./traefik/data/letsencrypt:/letsencrypt
+    #   #- traefik_data:/certs
+    #   - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - nat
+
+networks:
+    nat:
+      external: true
+
+# volumes:
+#   traefik_data:
+
+# # ###########################################
+# # Windows (Firewall)
+# New-NetFirewallRule -Name "TraefikHTTP80" -DisplayName "Traefik insecure on TCP/80" -Protocol tcp -LocalPort 80 -Action Allow -Enabled True
+# New-NetFirewallRule -Name "TraefikHTTPS443" -DisplayName "Traefik secure on TCP/443" -Protocol tcp -LocalPort 443 -Action Allow -Enabled True

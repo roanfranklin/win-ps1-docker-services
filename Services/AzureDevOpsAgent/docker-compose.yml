@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+
+  azureagent:
+    image: dockeragent:latest
+    container_name: azureagent
+    restart: always
+    environment:
+      - name=value
+      - AZP_URL=<Azure DevOps instance>
+      - AZP_TOKEN=<PAT token>
+      - AZP_AGENT_NAME=azureagent 
+    networks:
+      - appnet
+  
+
+networks:
+  appnet:
+    external: true
+
